@@ -119,8 +119,8 @@ app.post('/login', (req, res) => {
                 { expiresIn: '1h' }  // Opciones, como la caducidad
             );
 
-            res.json({ message: 'Login exitoso' });
-            res.json({ token });
+            res.json({token, message: 'Login exitoso' });
+            /* res.json({ token }); */
           } else {
               // Contraseña incorrecta
               res.status(401).json({ message: 'Contraseña incorrecta'});

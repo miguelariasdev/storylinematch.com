@@ -1,5 +1,9 @@
 <app-header></app-header>
-<app-register></app-register>
+
+  <app-login *ngIf="!isLoggedIn"></app-login>
+  <app-register *ngIf="!isLoggedIn"></app-register>
+  <app-movie-search *ngIf="isLoggedIn"></app-movie-search>
+
 
 <!-- En tu app.component.html, puedes utilizar la directiva *ngIf para alternar entre diferentes componentes basados en el estado de autenticación. -->
 

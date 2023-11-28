@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -8,6 +8,18 @@ import { HttpClient } from '@angular/common/http';
 })
 export class HeaderComponent {
 
-  constructor(private http: HttpClient) {}
+  isLoggedIn: boolean = false;
+
+  constructor(
+    private http: HttpClient,
+    private userService: UserService
+  ) {}
+
+  ngOnInit(){
+
+    this.userService.isLoggedIn().subscribe(isLoggedIn => {
+      this.isLoggedIn = isLoggedIn;
+    });
+  }
 
 }

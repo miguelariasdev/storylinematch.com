@@ -1,4 +1,4 @@
-<header class="bg-gray-800 text-white">
+<header class="bg-gray-600 text-white">
   <div class="container mx-auto px-4 py-2 flex justify-between items-center">
     <!-- Logo o título de la aplicación -->
     <a href="/" class="flex items-center">
@@ -6,7 +6,7 @@
     </a>
     
     <!-- Sección de iconos -->
-    <div class="flex items-center">
+    <div *ngIf="isLoggedIn" class="flex items-center">
       <!-- Icono de corazón para películas favoritas -->
       <a href="/favoritas" class="flex items-center hover:text-red-500 mx-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
