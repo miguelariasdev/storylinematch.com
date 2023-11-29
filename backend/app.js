@@ -1,46 +1,25 @@
 const express = require('express');
-const app = express();
+const OpenAI = require('openai').default;
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mysql = require('mysql');
 require('dotenv').config();
 
-// Después de crear la app de Express
+const app = express();
 app.use(cors());
-
 app.use(express.json());
 
-const bcrypt = require('bcryptjs');
-
-const jwt = require('jsonwebtoken');
-
-/* const corsOptions = {
-  origin: 'http://localhost:4200', // Reemplaza con el origen de tu frontend
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions)); */
-
-const PORT = process.env.PORT || 3000;
-
-app.get('/', (req, res) => {
-  res.send('Backend está funcionando!');
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
-
-
-const mysql = require('mysql');
-
-const jwtSecret = process.env.JWT_SECRET;
-
+// Configuración de la conexión a la base de datos
 const db = mysql.createConnection({
-
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE
-
 });
 
 db.connect((err) => {
@@ -48,89 +27,88 @@ db.connect((err) => {
         throw err;
     }
     console.log('Conectado a la base de datos');
-    /* res.send('Database connected!'); */
 });
 
-// No olvides exportar la conexión si la vas a usar en otros archivos
-module.exports = db;
+// Clave secreta para JWT
+const jwtSecret = process.env.JWT_SECRET;
 
+// Ruta raíz para verificar que el backend está funcionando
+app.get('/', (req, res) => {
+    res.send('Backend está funcionando!');
+});
 
-// endpoint to create users
-
+// Endpoint para crear usuarios
 app.post('/create-user', async (req, res) => {
-  const { username, password, email } = req.body;
-
-  // Validación básica
-  if (!username || !password || !email) {
-      return res.status(400).send('Please, complete all fields');
-  }
-
-  try {
-      // Encriptar la contraseña
-      const hashedPassword = await bcrypt.hash(password, 8);
-
-      // Insertar el nuevo usuario en la base de datos
-      const sql = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
-      db.query(sql, [username, hashedPassword, email], (err, result) => {
-          if (err) {
-              console.error(err);
-              return res.status(500).send('Error al registrar el usuario');
-          }
-          res.status(201).json({ message:'Usuario registrado con éxito' });
-      });
-  } catch (err) {
-      console.error(err);
-      res.status(500).send('Error en el servidor');
-  }
+    const { username, password, email } = req.body;
+    if (!username || !password || !email) {
+        return res.status(400).send('Please, complete all fields');
+    }
+    try {
+        const hashedPassword = await bcrypt.hash(password, 8);
+        const sql = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
+        db.query(sql, [username, hashedPassword, email], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error al registrar el usuario');
+            }
+            res.status(201).json({ message: 'Usuario registrado con éxito' });
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en el servidor');
+    }
 });
 
-// end point to login
-
+// Endpoint para iniciar sesión
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).send('Por favor, completa todos los campos');
+    }
+    const sql = 'SELECT * FROM users WHERE username = ?';
+    db.query(sql, [username], async (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error en el servidor');
+        }
+        if (results.length === 0) {
+            return res.status(401).json({ message: 'Usuario no encontrado' });
+        }
+        const user = results[0];
+        try {
+            if (await bcrypt.compare(password, user.password)) {
+                const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+                res.json({ token, message: 'Login exitoso' });
+            } else {
+                res.status(401).json({ message: 'Contraseña incorrecta' });
+            }
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Error en el servidor' });
+        }
+    });
+});
 
-  if (!username || !password) {
-      return res.status(400).send('Por favor, completa todos los campos');
-  }
+// Endpoint para generar respuesta de OpenAI
+app.post('/generate-response', async (req, res) => {
+    const prompt = req.body.prompt;
+    if (!prompt) {
+        return res.status(400).send('No prompt provided');
+    }
+    try {
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "gpt-3.5-turbo",
+        });
+        res.json({ response: completion.choices[0].message.content });
+    } catch (error) {
+        console.error('Error al llamar a OpenAI:', error);
+        res.status(500).send('Error al procesar la solicitud');
+    }
+});
 
-  const sql = 'SELECT * FROM users WHERE username = ?';
-  db.query(sql, [username], async (err, results) => {
-      if (err) {
-          console.error(err);
-          return res.status(500).send('Error en el servidor');
-      }
-
-      if (results.length === 0) {
-          return res.status(401).json({ message:'Usuario no encontrado'});
-      }
-
-      const user = results[0];
-
-      try {
-          if (await bcrypt.compare(password, user.password)) {
-            // Usuario autenticado con éxito
-            // Aquí puedes generar un token o una sesión según tu necesidad
-            /* res.send('Login exitoso'); */
-            
-            // Usuario autenticado con éxito
-            const token = jwt.sign(
-                { userId: user.id }, // Payload
-                jwtSecret,  // Clave secreta
-                { expiresIn: '1h' }  // Opciones, como la caducidad
-            );
-
-            res.json({token, message: 'Login exitoso' });
-            /* res.json({ token }); */
-          } else {
-              // Contraseña incorrecta
-              res.status(401).json({ message: 'Contraseña incorrecta'});
-          }
-      } catch (err) {
-          console.error(err);
-          res.status(500).json({ message: 'Error en el servidor'});
-      }
-  });
-
-
-
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
