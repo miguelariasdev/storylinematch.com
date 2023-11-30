@@ -13,7 +13,7 @@ export class HeaderComponent {
 
   constructor(
     private http: HttpClient,
-    private userService: UserService, 
+    public userService: UserService, 
     private router: Router
   ) {}
 

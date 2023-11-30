@@ -8,36 +8,41 @@
     <!-- Sección de iconos -->
     <!--     <div *ngIf="isLoggedIn" class="flex items-center"> -->
     <div class="flex items-center">
-      <!-- Icono de corazón para películas favoritas -->
-      <a routerLink="/favorites" class="flex items-center hover:text-red-500 mx-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M5.121 18.364A9.003 9.003 0 0121 12.5a9.003 9.003 0 01-15.879 5.864M21 12.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
-        </svg>
-        <span class="hidden sm:block ml-1">Favorites</span>
-      </a>
-      <!-- Avatar del usuario -->
-      <a routerLink="/user-profile" class="flex items-center hover:text-green-500 mx-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-        <span class="hidden sm:block ml-1"> Profile</span>
-      </a>
+      <ng-template *ngIf="userService.isAuthenticated(); else registerLink">
+        <!-- Icono de corazón para películas favoritas -->
+        <a routerLink="/favorites" class="flex items-center hover:text-red-500 mx-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5.121 18.364A9.003 9.003 0 0121 12.5a9.003 9.003 0 01-15.879 5.864M21 12.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+          </svg>
+          <span class="hidden sm:block ml-1">Favorites</span>
+        </a>
+        <!-- Avatar del usuario -->
+        <a routerLink="/user-profile" class="flex items-center hover:text-green-500 mx-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+          <span class="hidden sm:block ml-1"> Profile</span>
+        </a>
 
-      <!-- Botón de logout -->
-      <a (click)="logout()" class="flex items-center hover:text-blue-500 mx-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H9" />
-        </svg>
-        <span class="hidden sm:block ml-1">Logout</span>
-      </a>
-      <!-- Icono de lista para búsquedas marcadas -->
-      <!--       <a routerLink="/busquedas" class="flex items-center hover:text-blue-500 mx-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-        <span class="hidden sm:block ml-1">Log out</span>
-      </a> -->
+        <!-- Botón de logout -->
+        <a (click)="logout()" class="flex items-center hover:text-blue-500 mx-2 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H9" />
+          </svg>
+          <span class="hidden sm:block ml-1">Logout</span>
+        </a>
+      </ng-template>
+
+      <!-- Boton de registro -->
+      <ng-template #registerLink>
+        <a routerLink="/register" class="flex items-center hover:text-blue-500 mx-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+          <span class="hidden sm:block ml-1">Register</span>
+        </a>
+      </ng-template>
 
     </div>
   </div>
