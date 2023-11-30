@@ -107,8 +107,30 @@ app.post('/generate-response', async (req, res) => {
     }
 });
 
+
+const authenticateToken = (req, res, next) => {
+    // Obtener el token del encabezado de la solicitud
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (token == null) {
+        return res.sendStatus(401); // No token provided
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.sendStatus(403); // Token no válido o expirado
+        }
+        req.user = user;
+        next();
+    });
+};
+
+module.exports = authenticateToken;
+
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
+

@@ -15,6 +15,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { MovieSearchComponent } from './components/movie-search/movie-search.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { FavoritesComponent } from './components/favorites/favorites.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     FooterComponent,
     MovieListComponent,
     MovieSearchComponent,
-    SidebarComponent
+    SidebarComponent,
+    FavoritesComponent
   ],
   imports: [
     BrowserModule,

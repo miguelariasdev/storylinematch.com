@@ -1,26 +1,35 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private isAuthenticated = new BehaviorSubject<boolean>(false);
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
-  login(): void {
-    // Implementa el login
-    this.isAuthenticated.next(true);
+  login(username: string, password: string) {
+    return this.http.post<any>('http://localhost:3000/login', { username, password }).pipe(
+      tap(res => {
+        localStorage.setItem('token', res.token); // Almacena el token
+        this.isAuthenticatedSubject.next(true); // Actualiza el estado de autenticación
+      })
+    );
   }
 
-  logout(): void {
-    // Implementa el logout
-    this.isAuthenticated.next(false);
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
   }
 
-  isLoggedIn(): Observable<boolean> {
-    return this.isAuthenticated.asObservable();
+  get isAuthenticatedObservable() {
+    return this.isAuthenticatedSubject.asObservable();
   }
-  
+
+  logout() {
+    localStorage.removeItem('token'); // Elimina el token
+    this.isAuthenticatedSubject.next(false); // Actualiza el estado de autenticación
+  }
 }

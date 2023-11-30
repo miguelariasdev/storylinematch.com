@@ -1,18 +1,3 @@
 <app-header></app-header>
-
-  <app-login *ngIf="!isLoggedIn"></app-login>
-  <app-register *ngIf="!isLoggedIn"></app-register>
-  <app-movie-search *ngIf="isLoggedIn"></app-movie-search>
-
-
-<!-- En tu app.component.html, puedes utilizar la directiva *ngIf para alternar entre diferentes componentes basados en el estado de autenticación. -->
-
-<!-- <ng-container *ngIf="(userService.isLoggedIn() | async); else loggedOut">
-    <app-logged-in-header></app-logged-in-header>
-    Otros componentes para usuarios logueados 
-  </ng-container> 
-  
-  <ng-template #loggedOut>
-    <app-header></app-header>
-    Otros componentes para usuarios no logueados
-  </ng-template> -->
+<router-outlet></router-outlet>
+<app-footer></app-footer>
