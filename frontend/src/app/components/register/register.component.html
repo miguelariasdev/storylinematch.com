@@ -10,26 +10,26 @@
                     <div class="flex flex-col mb-4">
                         <label class="mb-2 font-bold text-lg text-gray-900" for="username">Usuario</label>
                         <input [(ngModel)]="user.username" class="border py-2 px-3 text-grey-800" type="text"
-                            name="username" id="username">
+                            name="username" id="username" required>
                     </div>
 
                     <div class="flex flex-col mb-4">
                         <label class="mb-2 font-bold text-lg text-gray-900" for="email">Email</label>
                         <input [(ngModel)]="user.email" class="border py-2 px-3 text-grey-800" type="email" name="email"
-                            id="email">
+                            id="email" required>
                     </div>
 
                     <div class="flex flex-col mb-6">
-                        <label class="mb-2 font-bold text-lg text-gray-900" for="password">Contraseña</label>
+                        <label class="mb-2 font-bold text-lg text-gray-900" for="password" required>Contraseña</label>
                         <input [(ngModel)]="user.password" class="border py-2 px-3 text-grey-800" type="password"
-                            name="password" id="password">
+                            name="password" id="password" required>
                     </div>
 
                     <div class="flex flex-col mb-4">
                         <label class="mb-2 font-bold text-lg text-gray-900" for="confirmPassword">Confirmar
                             Contraseña</label>
                         <input [(ngModel)]="confirmPassword" class="border py-2 px-3 text-grey-800" type="password"
-                            name="confirmPassword" id="confirmPassword">
+                            name="confirmPassword" id="confirmPassword" required>
                     </div>
 
                     <div *ngIf="errorMessage" class="mb-4 text-red-600">

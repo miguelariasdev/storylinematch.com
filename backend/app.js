@@ -91,7 +91,27 @@ app.post('/login', (req, res) => {
 
 // Endpoint para generar respuesta de OpenAI
 app.post('/generate-response', async (req, res) => {
-    const prompt = req.body.prompt;
+
+    const prompt = `
+    You are a movie expert.
+    I am going to give you a description of a story and I want you to give me a list of 10 movies that most closely resemble the story I am going to give you.
+    Give me only one json, I don't want any message before or after it.
+    Your input will always be a story of a movie if you think that what the user provides you is not related or is not a story from a movie just send me back this:
+    
+    {
+    "error" : "The input provided does not appear to be a movie story."
+    }
+    
+    your output must always be in valid JSON format like this: 
+    
+    movie_list: [
+        {
+          title: "",
+          release_year: "",
+          description: ""
+        }
+    input: I want movies about ` + req.body.prompt;
+
     if (!prompt) {
         return res.status(400).send('No prompt provided');
     }

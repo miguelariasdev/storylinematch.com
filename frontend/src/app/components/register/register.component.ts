@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -17,9 +18,14 @@ export class RegisterComponent {
   confirmPassword = '';
   errorMessage = '';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   createUser() {
+
+    if (!this.user.username || !this.user.email || !this.user.password || !this.confirmPassword) {
+      this.errorMessage = 'Por favor, completa todos los campos.';
+      return;
+    }
 
     if (this.user.password !== this.confirmPassword) {
       this.errorMessage = 'Las contraseñas no coinciden.';
@@ -32,9 +38,13 @@ export class RegisterComponent {
     }
 
     this.http.post('http://localhost:3000/create-user', this.user)
-      /*     this.http.post('https://api.storylinematch.com/create-user', this.user) */
+    /* this.http.post('https://api.storylinematch.com/create-user', this.user) */
       .subscribe({
-        next: (response) => console.log(response),
+        next: (response) => {
+          console.log(response)
+
+          this.router.navigate(['/']);
+        },
         error: (error) => {
           console.error(error);
           this.handleError(error);

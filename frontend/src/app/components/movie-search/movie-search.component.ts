@@ -9,7 +9,9 @@ import { OpenaiService } from 'src/app/services/openai.service';
 export class MovieSearchComponent {
 
   prompt: string = '';
-  response: string = '';
+  response: any = {};
+
+  isLoading = false;
 
   characterCount: number = 0;
   characterCountClass: string = 'text-black';
@@ -20,13 +22,21 @@ export class MovieSearchComponent {
 
   onSubmit(): void {
     console.log(this.prompt)
+
+    this.isLoading = true;
+
     this.openaiService.generateResponse(this.prompt).subscribe({
       next: (data) => {
-        this.response = data.response;
+        this.isLoading = false;
+        const jsonData = JSON.parse(data.response);
+        this.response = jsonData;
         // Maneja la respuesta aquí, por ejemplo, mostrarla en la UI
+        
         console.log(this.response)
+        
       },
       error: (error) => {
+        this.isLoading = false;
         console.error('Error:', error);
       }
     });

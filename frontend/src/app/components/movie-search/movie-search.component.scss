@@ -11,6 +11,7 @@
 
 .searcher-container{
     width: 70%;
+    min-height: 600px;
 }
 
 .cards-container{
@@ -21,6 +22,15 @@
     gap: 16px;
 }
 
+.loading{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    img {
+        width: 100px;
+    }
+}
 @media only screen and (max-width: 768px) {
     .container-movie{
         width: 100%;
