@@ -15,11 +15,13 @@ export class MovieSearchComponent {
   OpeanAIResponse: any = {};
 
   movieData: any = [];
+  stories: any = [];
 
   isLoading = false;
 
   characterCount: number = 0;
   characterCountClass: string = 'text-black';
+
 
   constructor ( private openaiService: OpenaiService, private movieDataService: MovieDataService, private storyHistoryService: StoryHistoryService ){
 
@@ -27,6 +29,7 @@ export class MovieSearchComponent {
 
   ngOnInit() {
     /* this.searchMovie("War Horse", "2011") */
+    this.loadStory();
   }
 
   onSubmit(): void {
@@ -59,6 +62,7 @@ export class MovieSearchComponent {
             console.log(movieDataJSON);
             console.log(this.movieData);
             this.insertStory(this.prompt, movieDataJSON);
+            this.loadStory();
     });
   }
         
@@ -132,6 +136,41 @@ export class MovieSearchComponent {
         console.error('Error al insertar historia', error);
       }
     });
+  }
+
+  loadStory() {
+    this.storyHistoryService.getStoryHistory().subscribe({
+      next: (stories) => {
+        this.stories = stories;
+        console.log(this.stories)
+      },
+      error: (error) => {
+        console.error('Error al cargar historias', error);
+      }
+    });
+  }
+
+  printStory( storyQuery: string) {
+
+    for (let i = 0; i < this.stories.length; i++) {
+
+      if (this.stories[i].query === storyQuery) {
+
+        console.log(this.stories[i].query)
+
+        const jsonObject = JSON.parse(this.stories[i].movies_data);
+        const jsonArray = Object.values(jsonObject);
+
+        this.movieData = jsonArray
+
+        console.log(this.movieData)
+      }
+      
+    }
+/*     const jsonObject = JSON.parse(stories);
+    const jsonArray = Object.values(jsonObject);
+
+    this.stories = jsonArray */
   }
 
   updateCharacterCount(event: Event): void {

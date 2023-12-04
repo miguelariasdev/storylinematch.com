@@ -214,3 +214,16 @@ app.post('/insert-story-history', authenticateToken, (req, res) => {
         res.status(201).json({ message: 'Historia insertada con éxito' });
     });
 });
+
+app.get('/get-story-history', authenticateToken, (req, res) => {
+    const idUser = req.id_user; // Asume que este es el ID del usuario obtenido del token
+
+    const sql = 'SELECT movies_data, query FROM story_history WHERE id_user = ?';
+    db.query(sql, [idUser], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al recuperar las historias');
+        }
+        res.json(results);
+    });
+});

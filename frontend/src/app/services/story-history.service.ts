@@ -24,6 +24,15 @@ export class StoryHistoryService {
     return this.http.post(endpoint, body, { headers: headers });
   }
 
+  getStoryHistory(): Observable<any> {
+    const endpoint = `${this.apiUrl}/get-story-history`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+  
+    return this.http.get(endpoint, { headers: headers });
+  }
+
   private getToken(): string {
     // Obtiene el token JWT almacenado en el cliente
     return localStorage.getItem('token') || '';
