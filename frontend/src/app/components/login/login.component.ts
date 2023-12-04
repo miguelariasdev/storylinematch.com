@@ -34,6 +34,7 @@ export class LoginComponent {
   login(username: string, password: string) {
     this.userService.login(username, password).subscribe({
       next: (res) => {
+        console.log(res)
         localStorage.setItem('token', res.token); // Almacena el token
         this.router.navigate(['/movie-search']); // Redirige al usuario
       },

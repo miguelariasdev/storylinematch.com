@@ -18,8 +18,10 @@
                 </div>
                 <div class="flex items-center justify-between px-3 py-2">
                     <span [ngClass]="characterCountClass">{{ 150 - characterCount }}</span>
-                    <button type="submit"
-                        class="inline-flex items-center py-2 px-10 text-s font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+                    <button 
+                        type="submit"
+                        class="inline-flex items-center py-2 px-10 text-s font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+                        [disabled]="isLoading">
                         Send
                     </button>
                 </div>
@@ -28,25 +30,29 @@
         <!-- Cards -->
 
         <div *ngIf="isLoading" class="loading">
-            <h2>The search usually takes up to 1 minute</h2>
+            <h2>The search could takes up to 1 minute</h2>
             <img src="../../../assets/img/loading.gif" alt="Cargando...">
         </div>
+        
+        <div *ngIf="movieData" class="cards-container">
 
-        <div *ngIf="response?.movie_list" class="cards-container">
-
-            <div *ngFor="let movie of response.movie_list" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                <a href="#">
-                    <img class="rounded-t-lg" src="https://img.freepik.com/vector-premium/vector-logotipo-cine-vector-pelicula-rollo-sobre-fondo-blanco_472355-306.jpg?w=740" alt="" />
-                </a>
+            <div *ngFor="let movie of movieData" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                <div class="primary-image">
+                    <img class="rounded-t-lg" [src]="movie.results[0].primaryImage.url" [alt]="movie.results[0].primaryImage.caption.plainText" />
+                    <!-- <img class="rounded-t-lg" src="https://img.freepik.com/vector-premium/vector-logotipo-cine-vector-pelicula-rollo-sobre-fondo-blanco_472355-306.jpg?w=740" alt="" /> -->
+                </div>
                 <div class="p-5">
+
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        {{movie.title}}
+                        {{movie.results[0].titleText.text}}
                     </h5>
+
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                        {{movie.release_year}}
+                        {{movie.results[0].releaseYear.year}}
                     </p>
+
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                        {{movie.description}}
+                        {{movie.results[0].plot.plotText.plainText}}
                     </p>
 
                     <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -60,9 +66,9 @@
 
         </div>
 
-        <div *ngIf="response.error">
+        <div *ngIf="this.OpeanAIResponse?.error">
 
-            <h2> {{ response.error }}</h2>
+            <h2> {{ this.OpeanAIResponse?.error }}</h2>
 
         </div>
 

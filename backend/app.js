@@ -1,4 +1,6 @@
 const express = require('express');
+const axios = require('axios');
+const https = require('https');
 const OpenAI = require('openai').default;
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -77,7 +79,7 @@ app.post('/login', (req, res) => {
         const user = results[0];
         try {
             if (await bcrypt.compare(password, user.password)) {
-                const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+                const token = jwt.sign({ userId: user.id_user }, jwtSecret, { expiresIn: '1h' });
                 res.json({ token, message: 'Login exitoso' });
             } else {
                 res.status(401).json({ message: 'Contraseña incorrecta' });
@@ -88,6 +90,7 @@ app.post('/login', (req, res) => {
         }
     });
 });
+
 
 // Endpoint para generar respuesta de OpenAI
 app.post('/generate-response', async (req, res) => {
@@ -107,8 +110,7 @@ app.post('/generate-response', async (req, res) => {
     movie_list: [
         {
           title: "",
-          release_year: "",
-          description: ""
+          release_year: ""
         }
     input: I want movies about ` + req.body.prompt;
 
@@ -127,6 +129,48 @@ app.post('/generate-response', async (req, res) => {
     }
 });
 
+app.get('/search-movie', (req, res) => {
+    const { title, year } = req.query;
+    rapidAPIKey = process.env.RAPID_API_KEY
+
+    if (!title || !year) {
+        return res.status(400).send('Debe proporcionar un título y un año.');
+    }
+
+    const encodedTitle = encodeURIComponent(title);
+    const options = {
+        method: 'GET',
+        hostname: 'moviesdatabase.p.rapidapi.com',
+        port: null,
+        path: `/titles/search/title/${encodedTitle}?exact=true&info=base_info&year=${year}&titleType=movie`,
+        headers: {
+            'X-RapidAPI-Key': rapidAPIKey,
+            'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
+        }
+
+        
+    };
+
+    const reqApi = https.request(options, function (resApi) {
+        const chunks = [];
+
+        resApi.on('data', function (chunk) {
+            chunks.push(chunk);
+        });
+
+        resApi.on('end', function () {
+            const body = Buffer.concat(chunks);
+            res.send(body.toString());
+        });
+    });
+
+    reqApi.on('error', function(e) {
+        console.error(`problem with request: ${e.message}`);
+        res.status(500).send(e.message);
+    });
+
+    reqApi.end();
+});
 
 const authenticateToken = (req, res, next) => {
     // Obtener el token del encabezado de la solicitud
@@ -137,11 +181,11 @@ const authenticateToken = (req, res, next) => {
         return res.sendStatus(401); // No token provided
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
         if (err) {
             return res.sendStatus(403); // Token no válido o expirado
         }
-        req.user = user;
+        req.id_user = decodedToken.userId;
         next();
     });
 };
@@ -154,3 +198,19 @@ app.listen(PORT, () => {
     console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
 
+// insertar historia de busqueda en el historial
+// a traves del authenticate desciframos el id del usuario
+
+app.post('/insert-story-history', authenticateToken, (req, res) => {
+    const idUser = req.id_user; // Obtiene el id_user del middleware
+    const { query, movies_data } = req.body;
+
+    const sql = 'INSERT INTO story_history (id_user, query, movies_data) VALUES (?, ?, ?)';
+    db.query(sql, [idUser, query, movies_data], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al insertar en la base de datos');
+        }
+        res.status(201).json({ message: 'Historia insertada con éxito' });
+    });
+});
