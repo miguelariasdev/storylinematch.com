@@ -4,7 +4,6 @@ import { OpenaiService } from 'src/app/services/openai.service';
 import { MovieDataService } from 'src/app/services/movie-data.service';
 import { StoryHistoryService } from 'src/app/services/story-history.service';
 
-
 @Component({
   selector: 'app-movie-search',
   templateUrl: './movie-search.component.html',
@@ -19,16 +18,11 @@ export class MovieSearchComponent {
 
   isLoading = false;
 
-  interface Movie {
-    title: string;
-    release_year: string; // o number, según tu estructura de datos
-  }
-
   characterCount: number = 0;
   characterCountClass: string = 'text-black';
 
-  constructor ( private openaiService: OpenaiService, private movieDataService: MovieDataService, private storyHistoryService: StoryHistoryService,  ){
-    
+  constructor ( private openaiService: OpenaiService, private movieDataService: MovieDataService, private storyHistoryService: StoryHistoryService ){
+
   }
 
   ngOnInit() {
@@ -50,30 +44,23 @@ export class MovieSearchComponent {
 
         console.log(this.OpeanAIResponse);
 
-        if ( this.OpeanAIResponse.movie_list) {
+        const moviePromises = [];
 
-/*           for (let i = 0; i < this.OpeanAIResponse.movie_list.length; i++) {
-
-            this.searchMovie(this.OpeanAIResponse.movie_list[i].title, this.OpeanAIResponse.movie_list[i].release_year)
+        if (this.OpeanAIResponse.movie_list) {
+          for (let movie of this.OpeanAIResponse.movie_list) {
+            // Asumiendo que searchMovie ahora devuelve una Promise
+            const moviePromise = this.searchMovie(movie.title, movie.release_year);
+            moviePromises.push(moviePromise);
           }
 
-          const movieDataJSON = JSON.stringify(this.movieData);
-          console.log(movieDataJSON) 
-          console.log(this.movieData)
-          this.insertStory(this.prompt, movieDataJSON); */
-
-          const moviePromises: Promise<any>[] = this.OpeanAIResponse.movie_list.map(movie: Movie =>
-            this.searchMovie(movie.title, movie.release_year)   
-
           Promise.all(moviePromises).then(() => {
+            // Ahora this.movieData debe estar completo
             const movieDataJSON = JSON.stringify(this.movieData);
             console.log(movieDataJSON);
+            console.log(this.movieData);
             this.insertStory(this.prompt, movieDataJSON);
-          });
-
-        }
-
-        console.log(this.movieData)
+    });
+  }
         
       },
       error: (error) => {
@@ -87,10 +74,10 @@ export class MovieSearchComponent {
     return new Promise((resolve, reject) => {
       this.movieDataService.getMovieData(title, year).subscribe(
         data => {
-          let result;
+          let movieData;
   
           if (!data.results[0]) {
-            result = {
+            movieData = {
               "results": [
                 {
                   "primaryImage": {
@@ -111,29 +98,28 @@ export class MovieSearchComponent {
                     "__typename": "YearRange"
                   },
                   "plot": {
-                    "plotText": {
-                      "plainText": "N/A"
+                    "plotText" : {
+                      "plainText" : "N/A"
                     }
                   }
                 }
               ]
             };
           } else {
-            result = data;
+            movieData = data;
           }
   
-          this.movieData.push(result);
-          resolve(result); // Resuelve la promesa con el resultado
+          this.movieData.push(movieData);
+          resolve(movieData); // Resolver la promesa con los datos de la película
         },
         error => {
           console.error(error);
-          reject(error); // Rechaza la promesa en caso de error
+          reject(error); // Rechazar la promesa en caso de error
         }
       );
     });
   }
   
-
   insertStory(query: string, moviesData: any){
 
     this.storyHistoryService.postStoryHistory(query, moviesData).subscribe({
