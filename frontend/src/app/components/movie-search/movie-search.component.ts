@@ -3,6 +3,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 import { MovieDataService } from 'src/app/services/movie-data.service';
 import { StoryHistoryService } from 'src/app/services/story-history.service';
+import { FavoriteMoviesService } from 'src/app/services/favorite-movie.service';
 
 @Component({
   selector: 'app-movie-search',
@@ -16,20 +17,30 @@ export class MovieSearchComponent {
 
   movieData: any = [];
   stories: any = [];
+  movieFavoriteData: any = [];
 
   isLoading = false;
 
   characterCount: number = 0;
   characterCountClass: string = 'text-black';
 
+  selectedStoryIndex: number | null = null;
 
-  constructor ( private openaiService: OpenaiService, private movieDataService: MovieDataService, private storyHistoryService: StoryHistoryService ){
+
+
+
+  constructor ( private openaiService: OpenaiService, 
+    private movieDataService: MovieDataService, 
+    private storyHistoryService: StoryHistoryService,
+    private favoriteMoviesService: FavoriteMoviesService ){
 
   }
 
   ngOnInit() {
-    /* this.searchMovie("War Horse", "2011") */
     this.loadStory();
+
+    this.getFavoriteMovies();
+
   }
 
   onSubmit(): void {
@@ -79,7 +90,8 @@ export class MovieSearchComponent {
       this.movieDataService.getMovieData(title, year).subscribe(
         data => {
           let movieData;
-  
+          this.getFavoriteMovies();
+
           if (!data.results[0]) {
             movieData = {
               "results": [
@@ -112,7 +124,23 @@ export class MovieSearchComponent {
           } else {
             movieData = data;
           }
-  
+          
+          console.log(this.movieData)
+          console.log(this.movieFavoriteData)
+
+          // Añadiendo isFavorite
+        this.movieData.forEach((movie: any) => {
+          let isFavorite = false;
+          this.movieFavoriteData.forEach((favoriteMovie: any) => {
+              if (favoriteMovie.results.length > 0 && movie.results.length > 0) {
+                  if (favoriteMovie.results[0].titleText.text === movie.results[0].titleText.text) {
+                      isFavorite = true;
+                  }
+              }
+          });
+          movie.isFavorite = isFavorite;
+        });
+
           this.movieData.push(movieData);
           resolve(movieData); // Resolver la promesa con los datos de la película
         },
@@ -163,14 +191,84 @@ export class MovieSearchComponent {
 
         this.movieData = jsonArray
 
-        console.log(this.movieData)
+         // Añadiendo isFavorite
+         this.movieData.forEach((movie: any) => {
+          let isFavorite = false;
+          this.movieFavoriteData.forEach((favoriteMovie: any) => {
+              if (favoriteMovie.results.length > 0 && movie.results.length > 0) {
+                  if (favoriteMovie.results[0].titleText.text === movie.results[0].titleText.text) {
+                      isFavorite = true;
+                  }
+              }
+          });
+          movie.isFavorite = isFavorite;
+      });
+
       }
       
     }
-/*     const jsonObject = JSON.parse(stories);
-    const jsonArray = Object.values(jsonObject);
+  }
 
-    this.stories = jsonArray */
+  favoriteMovie(index: number, isFavorite: boolean){
+
+    if ( isFavorite ) {
+      console.log("eliminar favorita")
+
+      this.movieData[index].isFavorite = false;
+      /* const movieDataJSON = JSON.stringify(this.movieData[index]); */
+
+      this.deleteFavoriteMovie(this.movieData[index].results[0].titleText.text);
+    } else if (isFavorite === false) {
+
+      this.movieData[index].isFavorite = true;
+      const movieDataJSON = JSON.stringify(this.movieData[index]);
+
+      this.insertFavoriteMovie(this.movieData[index].results[0].titleText.text , movieDataJSON);
+    }
+
+    
+  }
+
+  getFavoriteMovies() {
+    this.favoriteMoviesService.getFavoriteMovies().subscribe({
+      next: (movies) => {
+
+        for (let i = 0; i < movies.length; i++) {
+          this.movieFavoriteData.push(JSON.parse(movies[i].movie_data))
+        }
+
+        console.log(this.movieFavoriteData)
+        
+      },
+      error: (error) => {
+        console.error('Error al obtener películas favoritas', error);
+      }
+    });
+  }
+
+  insertFavoriteMovie(title: string, movieData: any) {
+    this.favoriteMoviesService.postFavoriteMovie(title, movieData).subscribe({
+        next: (response) => {
+            // Manejar respuesta
+            console.log('Película favorita insertada', response);
+        },
+        error: (error) => {
+            // Manejar error
+            console.error('Error al insertar película favorita', error);
+        }
+    });
+  }
+
+  deleteFavoriteMovie(title: string) {
+    this.favoriteMoviesService.deleteFavoriteMovie(title).subscribe({
+      next: (response) => {
+        console.log('Película favorita eliminada', response);
+        // Podrías hacer algo aquí si necesitas actualizar la UI después de eliminar la película de favoritos
+      },
+      error: (error) => {
+        console.error('Error al eliminar película favorita', error);
+      }
+    });
   }
 
   updateCharacterCount(event: Event): void {

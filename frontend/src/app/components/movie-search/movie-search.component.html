@@ -2,12 +2,12 @@
 
     <!-- <div class="sidebar w-3/12 mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600"> -->
     <div class="sidebar-container border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-        <h2>Historial de búsquedas</h2>
-        <div class="story-list" *ngIf="stories" >
+        <h2 class="text-xl underline">Historial de búsquedas</h2>
+        <div class="story-list" *ngIf="stories">
             <div *ngFor="let story of stories">
-
-            <h4 (click)="printStory(story.query)"> {{ story.query }}</h4>
-
+                <div (click)="printStory(story.query)" class="story-line">
+                    <h4> {{ story.query }}</h4>
+                </div>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
         
         <div *ngIf="movieData" class="cards-container">
 
-            <div *ngFor="let movie of movieData" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div *ngFor="let movie of movieData; let i = index" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <div class="primary-image">
                     <img class="rounded-t-lg" [src]="movie.results[0].primaryImage.url" [alt]="movie.results[0].primaryImage.caption.plainText" />
                     <!-- <img class="rounded-t-lg" src="https://img.freepik.com/vector-premium/vector-logotipo-cine-vector-pelicula-rollo-sobre-fondo-blanco_472355-306.jpg?w=740" alt="" /> -->
@@ -62,12 +62,9 @@
                         {{movie.results[0].plot.plotText.plainText}}
                     </p>
 
-                    <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        Read more
-                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                        </svg>
-                    </a>
+                    <div class="favorite">
+                        <img [src]="movie.isFavorite ? '../../../assets/img/heart.png' : '../../../assets/img/heart-empty.png'" (click)="favoriteMovie(i, movie.isFavorite);"> 
+                    </div>
                 </div>
             </div>
 

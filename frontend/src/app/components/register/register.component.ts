@@ -11,6 +11,9 @@ export class RegisterComponent {
 
   user = {
     username: '',
+    name: '',
+    lastname: '',
+    middle_name: '',
     email: '',
     password: ''
   };

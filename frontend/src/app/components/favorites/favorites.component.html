@@ -1,1 +1,28 @@
-<p>favorites works!</p>
+<div *ngIf="movieData" class="cards-container">
+
+    <div *ngFor="let movie of movieData; let i = index" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <div class="primary-image">
+            <img class="rounded-t-lg" [src]="movie.results[0].primaryImage.url" [alt]="movie.results[0].primaryImage.caption.plainText" />
+            <!-- <img class="rounded-t-lg" src="https://img.freepik.com/vector-premium/vector-logotipo-cine-vector-pelicula-rollo-sobre-fondo-blanco_472355-306.jpg?w=740" alt="" /> -->
+        </div>
+        <div class="p-5">
+
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {{movie.results[0].titleText.text}}
+            </h5>
+
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                {{movie.results[0].releaseYear.year}}
+            </p>
+
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                {{movie.results[0].plot.plotText.plainText}}
+            </p>
+
+            <div class="favorite">
+                <img src="../../../assets/img/heart.png" (click)="favoriteMovie(i, movie.isFavorite);"> 
+            </div>
+        </div>
+    </div>
+
+</div>

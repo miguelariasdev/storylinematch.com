@@ -7,6 +7,32 @@
 
 .sidebar-container{
     width: 25%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    h2 {
+        padding-bottom: 30px;
+    }
+}
+
+.story-list{
+    display: flex;
+    justify-content: center;
+    flex-direction: column-reverse;
+    gap: 15px;
+}
+
+.story-line{
+    border: 1px solid #e5e7eb;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.story-line:hover{
+    cursor: pointer;
+    background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+    color: white;
 }
 
 .searcher-container{
@@ -22,6 +48,10 @@
     gap: 16px;
 }
 
+.favorite{
+    width: 30px;
+}
+
 .loading{
     display: flex;
     justify-content: center;
@@ -31,6 +61,7 @@
         width: 100px;
     }
 }
+
 
 @media only screen and (max-width: 768px) {
     .container-movie{
