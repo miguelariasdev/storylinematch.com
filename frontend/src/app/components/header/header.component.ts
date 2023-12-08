@@ -11,6 +11,8 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class HeaderComponent {
 
+  menuVisible: boolean = false;
+
   constructor(
     private http: HttpClient,
     public userService: UserService, 
@@ -24,6 +26,10 @@ export class HeaderComponent {
   logout() {
     this.userService.logout(); // Llama al método de logout de tu UserService
     this.router.navigate(['/']); // Redirige al usuario a la página de login
+  }
+
+  toggleMenu(): void {
+    this.menuVisible = !this.menuVisible;
   }
 
 }

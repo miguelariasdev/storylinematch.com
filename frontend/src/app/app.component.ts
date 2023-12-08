@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

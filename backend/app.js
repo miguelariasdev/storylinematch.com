@@ -62,14 +62,14 @@ app.get('/', (req, res) => {
 }); */
 
 app.post('/create-user', async (req, res) => {
-    const { username, name, lastname, middle_name, email, password } = req.body;
-    if (!username || !password || !email || !name || !lastname || !middle_name) {
+    const { username, name, lastname, email, password } = req.body;
+    if (!username || !password || !email || !name || !lastname ) {
         return res.status(400).send('Por favor, complete todos los campos.');
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 8);
-        const sql = 'INSERT INTO users (username, name, lastname, middle_name, email, password) VALUES (?, ?, ?, ?, ?, ?)';
-        db.query(sql, [username, name, lastname, middle_name, email, hashedPassword], (err, result) => {
+        const sql = 'INSERT INTO users (username, name, lastname, email, password) VALUES (?, ?, ?, ?, ?)';
+        db.query(sql, [username, name, lastname, email, hashedPassword], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send('Error al registrar el usuario');
@@ -213,12 +213,6 @@ const authenticateToken = (req, res, next) => {
 
 module.exports = authenticateToken;
 
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
-
 // insertar historia de busqueda en el historial
 // a traves del authenticate desciframos el id del usuario
 
@@ -310,4 +304,11 @@ app.delete('/delete-favorite-movie/:title', authenticateToken, (req, res) => {
 
         res.status(200).json({ message: 'Película eliminada con éxito' });
     });
+});
+
+
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
 });

@@ -27,9 +27,8 @@ export class FavoritesComponent {
         for (let i = 0; i < movies.length; i++) {
           this.movieData.push(JSON.parse(movies[i].movie_data))
         }
-
-        console.log(this.movieData)
         
+        this.movieData.reverse();
       },
       error: (error) => {
         console.error('Error al obtener películas favoritas', error);
@@ -42,6 +41,12 @@ export class FavoritesComponent {
       next: (response) => {
         console.log('Película eliminada con éxito:', response);
         // Aquí puedes actualizar la vista o realizar acciones adicionales
+              // Encuentra el índice de la película eliminada en el array
+      const index = this.movieData.findIndex((movie:any) => movie.results[0].titleText.text === title);
+      
+      if (index !== -1) {
+        this.movieData.splice(index, 1);
+      }
       },
       error: (error) => {
         console.error('Error al eliminar película', error);
@@ -102,16 +107,10 @@ export class FavoritesComponent {
 
   favoriteMovie(index: number, isFavorite: boolean){
 
-/*     if ( isFavorite ) {
-
-      this.movieData[index].isFavorite = false;
-    } */
-
     this.deleteFavoriteMovie(this.movieData[index].results[0].titleText.text);
 
     this.movieData = []
     this.getFavoriteMovies();
-    console.log(this.movieData)
     
   }
 

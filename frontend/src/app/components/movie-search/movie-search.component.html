@@ -2,7 +2,7 @@
 
     <!-- <div class="sidebar w-3/12 mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600"> -->
     <div class="sidebar-container border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-        <h2 class="text-xl underline">Historial de búsquedas</h2>
+        <h2 class="text-xl dark:text-gray-400">Search history</h2>
         <div class="story-list" *ngIf="stories">
             <div *ngFor="let story of stories">
                 <div (click)="printStory(story.query)" class="story-line">
