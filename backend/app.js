@@ -3,6 +3,7 @@ const axios = require('axios');
 const https = require('https');
 const OpenAI = require('openai').default;
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
@@ -39,42 +40,72 @@ app.get('/', (req, res) => {
     res.send('Backend está funcionando!');
 });
 
-// Endpoint para crear usuarios
-/* app.post('/create-user', async (req, res) => {
-    const { username, password, email } = req.body;
-    if (!username || !password || !email) {
-        return res.status(400).send('Please, complete all fields');
+// Endpoint para iniciar sesión
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).send('Please complete all fields');
     }
-    try {
-        const hashedPassword = await bcrypt.hash(password, 8);
-        const sql = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
-        db.query(sql, [username, hashedPassword, email], (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error al registrar el usuario');
-            }
-            res.status(201).json({ message: 'Usuario registrado con éxito' });
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error en el servidor');
-    }
-}); */
+    const sql = 'SELECT * FROM users WHERE email = ?';
+    db.query(sql, [email], async (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Server error' });
+        }
+        if (results.length === 0) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+        const user = results[0];
 
+        if (!user.is_verified) {
+            return res.status(401).json({ message: 'Unverified user. Please verify your email to activate your account.' });
+        }
+
+        try {
+            if (await bcrypt.compare(password, user.password)) {
+                const token = jwt.sign({ userId: user.id_user }, jwtSecret, { expiresIn: '1h' });
+                res.json({ token, message: 'Successful login' });
+            } else {
+                res.status(401).json({ message: 'Incorrect password' });
+            }
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    });
+});
+
+// endpoint para crear usuarios
 app.post('/create-user', async (req, res) => {
     const { username, name, lastname, email, password } = req.body;
-    if (!username || !password || !email || !name || !lastname ) {
+    if (!username || !password || !email || !name || !lastname) {
         return res.status(400).send('Por favor, complete todos los campos.');
     }
+
     try {
         const hashedPassword = await bcrypt.hash(password, 8);
         const sql = 'INSERT INTO users (username, name, lastname, email, password) VALUES (?, ?, ?, ?, ?)';
         db.query(sql, [username, name, lastname, email, hashedPassword], (err, result) => {
             if (err) {
                 console.error(err);
-                return res.status(500).send('Error al registrar el usuario');
+                return res.status(500).send('Error registering user');
             }
-            res.status(201).json({ message: 'Usuario registrado con éxito' });
+
+            // Generar un token de verificación
+            const verificationToken = generateVerificationToken(email); // Asegúrate de que esta función esté definida y accesible
+
+            // Guardar el token en la base de datos para el usuario
+            const updateSql = 'UPDATE users SET verification_token = ? WHERE email = ?';
+            db.query(updateSql, [verificationToken, email], (err, updateResult) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Error saving verification token');
+                }
+
+                // Enviar correo electrónico con el token de verificación
+                sendVerificationEmail(email, verificationToken);
+                res.status(201).json({ message: 'Registered user successfully. Check your email.' });
+            });
         });
     } catch (err) {
         console.error(err);
@@ -82,36 +113,63 @@ app.post('/create-user', async (req, res) => {
     }
 });
 
-// Endpoint para iniciar sesión
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).send('Por favor, completa todos los campos');
+// Función para generar un token de verificación
+function generateVerificationToken( email ) {
+    return jwt.sign({ email }, jwtSecret, { expiresIn: '24h' }); // Asegúrate de que este token sea único y seguro.
+}
+
+let transporter = nodemailer.createTransport({
+    host: 'mail.storylinematch.com', // Ejemplo: 'mail.tudominio.com'
+    port: 465,     // Por lo general 465 para SSL o 587 para TLS
+    secure: true,             // true para 465, false para otros puertos
+    auth: {
+        user: 'no-reply@storylinematch.com',
+        pass: process.env.PASS_EMAIL
     }
-    const sql = 'SELECT * FROM users WHERE username = ?';
-    db.query(sql, [username], async (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error en el servidor');
-        }
-        if (results.length === 0) {
-            return res.status(401).json({ message: 'Usuario no encontrado' });
-        }
-        const user = results[0];
-        try {
-            if (await bcrypt.compare(password, user.password)) {
-                const token = jwt.sign({ userId: user.id_user }, jwtSecret, { expiresIn: '1h' });
-                res.json({ token, message: 'Login exitoso' });
-            } else {
-                res.status(401).json({ message: 'Contraseña incorrecta' });
-            }
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ message: 'Error en el servidor' });
-        }
-    });
 });
 
+function sendVerificationEmail(email, token) {
+    
+    const verificationUrl = `https://storylinematch.com/email-verification?token=${token}`;
+
+    let mailOptions = {
+        from: 'no-reply@storylinematch.com',
+        to: email,
+        subject: 'Email verification - StoryLineMatch',
+        html: `Hi y'all. Welcome to storylinematch!<br>Please click this link to verify your email: <a href="${verificationUrl}">${verificationUrl}</a>`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email enviado: ' + info.response);
+        }
+    });
+}
+
+app.get('/verify-email', (req, res) => {
+    const { token } = req.query;
+
+    try {
+        const { email } = jwt.verify(token, jwtSecret);
+        const sql = 'UPDATE users SET is_verified = TRUE WHERE email = ?';
+
+        db.query(sql, [email], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Server error' });
+            }
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'User not found or already verified' });
+            }
+
+            res.json({ message: 'Email successfully verified. You are being redirected...' });
+        });
+    } catch (err) {
+        res.status(400).json({ message: 'Invalid or expired token' });
+    }
+});
 
 // Endpoint para generar respuesta de OpenAI
 app.post('/generate-response', async (req, res) => {
@@ -169,7 +227,7 @@ app.get('/search-movie', (req, res) => {
             'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
         }
 
-        
+
     };
 
     const reqApi = https.request(options, function (resApi) {
@@ -185,7 +243,7 @@ app.get('/search-movie', (req, res) => {
         });
     });
 
-    reqApi.on('error', function(e) {
+    reqApi.on('error', function (e) {
         console.error(`problem with request: ${e.message}`);
         res.status(500).send(e.message);
     });
@@ -303,6 +361,23 @@ app.delete('/delete-favorite-movie/:title', authenticateToken, (req, res) => {
         }
 
         res.status(200).json({ message: 'Película eliminada con éxito' });
+    });
+});
+
+app.get('/user-info', authenticateToken, (req, res) => {
+    const userId = req.id_user; // Obtenido del token JWT por el middleware authenticateToken
+
+    const sql = 'SELECT username, name, lastname, email, created_at FROM users WHERE id_user = ?';
+    db.query(sql, [userId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error en el servidor');
+        }
+        if (result.length === 0) {
+            return res.status(404).send('Usuario no encontrado');
+        }
+
+        res.json(result[0]);
     });
 });
 

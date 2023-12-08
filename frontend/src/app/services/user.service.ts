@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
@@ -11,14 +11,20 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string) {
-    return this.http.post<any>('http://localhost:3000/login', { username, password }).pipe(
+  login(email: string, password: string) {
+    return this.http.post<any>('http://localhost:3000/login', { email, password }).pipe(
     /* return this.http.post<any>('https://api.storylinematch.com/login', { username, password }).pipe( */
       tap(res => {
         localStorage.setItem('token', res.token); // Almacena el token
         this.isAuthenticatedSubject.next(true); // Actualiza el estado de autenticación
       })
     );
+  }
+
+  getUserInfo(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.get<any>('http://localhost:3000/user-info', { headers });
   }
 
   isAuthenticated(): boolean {

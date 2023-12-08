@@ -10,6 +10,9 @@
   })
   export class RegisterComponent {
 
+    message: string = '';
+    showModal: boolean = false;
+
     user = {
       username: '',
       name: '',
@@ -43,8 +46,6 @@
 
       if (this.registerForm.invalid) {
         this.errorMessage = 'Please complete all fields correctly.';
-        console.log(this.registerForm);
-        console.log(this.registerForm.invalid)
         return;
       }
 
@@ -55,9 +56,16 @@
 
       this.http.post('http://localhost:3000/create-user', this.registerForm.value)
         .subscribe({
-          next: (response) => {
+          next: (response: any) => {
             console.log(response)
+
+          this.message = response.message;
+          this.showModal = true;
+          setTimeout(() => {
+            this.showModal = false;
             this.router.navigate(['/']);
+          }, 3000);
+
           },
           error: (error) => {
             console.error(error);
@@ -92,10 +100,15 @@
 
     handleError(error: any) {
       if (error.status === 500) { // Suponiendo que el backend devuelve 409 para conflictos como usuario o email existente
-        this.errorMessage = 'El usuario o el email ya existen.';
+        this.errorMessage = 'The user or email already exists.';
       } else {
-        this.errorMessage = 'Error al registrar el usuario.';
+        this.errorMessage = 'Error registering user.';
       }
     }
+
+    closeModal() {
+      this.showModal = false;
+    }
+
 
   }

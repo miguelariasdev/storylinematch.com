@@ -8,11 +8,13 @@ import { UserProfileComponent } from './pages/user-profile/user-profile.componen
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { MovieSearchComponent } from './components/movie-search/movie-search.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
+import { EmailVerificationComponent } from './components/email-verification/email-verification.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
 /*   { path: 'login', component: LoginComponent }, */
   { path: 'register', component: RegisterComponent },
+  { path: 'email-verification', component: EmailVerificationComponent},
   { path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard] },
   { path: 'movie-list', component: MovieListComponent, canActivate: [AuthGuard] },
   { path: 'movie-search', component: MovieSearchComponent, canActivate: [AuthGuard] },

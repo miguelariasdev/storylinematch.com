@@ -17,6 +17,7 @@ import { MovieListComponent } from './components/movie-list/movie-list.component
 import { MovieSearchComponent } from './components/movie-search/movie-search.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
+import { EmailVerificationComponent } from './components/email-verification/email-verification.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { FavoritesComponent } from './components/favorites/favorites.component';
     MovieListComponent,
     MovieSearchComponent,
     SidebarComponent,
-    FavoritesComponent
+    FavoritesComponent,
+    EmailVerificationComponent
   ],
   imports: [
     BrowserModule,
