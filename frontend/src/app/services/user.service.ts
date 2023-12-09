@@ -27,6 +27,14 @@ export class UserService {
     return this.http.get<any>('http://localhost:3000/user-info', { headers });
   }
 
+  requestPasswordReset(email: string) {
+    return this.http.post('http://localhost:3000/request-reset-password', { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post<any>('http://localhost:3000/reset-password', { token, newPassword });
+  }
+
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
   }

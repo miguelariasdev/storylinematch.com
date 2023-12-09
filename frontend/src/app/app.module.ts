@@ -18,6 +18,8 @@ import { MovieSearchComponent } from './components/movie-search/movie-search.com
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { EmailVerificationComponent } from './components/email-verification/email-verification.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { RequestResetPasswordComponent } from './components/request-reset-password/request-reset-password.component';
 
 
 @NgModule({
@@ -32,7 +34,9 @@ import { EmailVerificationComponent } from './components/email-verification/emai
     MovieSearchComponent,
     SidebarComponent,
     FavoritesComponent,
-    EmailVerificationComponent
+    EmailVerificationComponent,
+    ResetPasswordComponent,
+    RequestResetPasswordComponent
   ],
   imports: [
     BrowserModule,

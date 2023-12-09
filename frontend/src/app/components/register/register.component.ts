@@ -64,7 +64,7 @@
           setTimeout(() => {
             this.showModal = false;
             this.router.navigate(['/']);
-          }, 3000);
+          }, 5000);
 
           },
           error: (error) => {

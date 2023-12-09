@@ -53,12 +53,12 @@ app.post('/login', (req, res) => {
             return res.status(500).json({ message: 'Server error' });
         }
         if (results.length === 0) {
-            return res.status(401).json({ message: 'User not found' });
+            return res.status(401).json({ message: 'Email not found' });
         }
         const user = results[0];
 
         if (!user.is_verified) {
-            return res.status(401).json({ message: 'Unverified user. Please verify your email to activate your account.' });
+            return res.status(401).json({ message: 'Unverified email. Please verify your email to activate your account.' });
         }
 
         try {
@@ -79,7 +79,7 @@ app.post('/login', (req, res) => {
 app.post('/create-user', async (req, res) => {
     const { username, name, lastname, email, password } = req.body;
     if (!username || !password || !email || !name || !lastname) {
-        return res.status(400).send('Por favor, complete todos los campos.');
+        return res.status(400).send('Please complete all fields.');
     }
 
     try {
@@ -143,7 +143,7 @@ function sendVerificationEmail(email, token) {
         if (error) {
             console.log(error);
         } else {
-            console.log('Email enviado: ' + info.response);
+            console.log('Email sent: ' + info.response);
         }
     });
 }
@@ -168,6 +168,94 @@ app.get('/verify-email', (req, res) => {
         });
     } catch (err) {
         res.status(400).json({ message: 'Invalid or expired token' });
+    }
+});
+
+app.post('/request-reset-password', (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message:'Email is required'});
+    }
+
+    const sql = 'SELECT * FROM users WHERE email = ?';
+    db.query(sql, [email], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message:'Server error'});
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Email not found' });
+        }
+        
+        const resetToken = generateResetToken(email); // Esta función debe ser implementada para generar un token
+
+        // Guardar el token en la base de datos
+        const updateSql = 'UPDATE users SET reset_token = ?, reset_token_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = ?';
+        db.query(updateSql, [resetToken, email], (updateErr, updateResult) => {
+            if (updateErr) {
+                console.error(updateErr);
+                return res.status(500).json({ message:'Error saving reset token'});
+            }
+
+            // Enviar correo electrónico con el enlace de restablecimiento
+            sendResetPasswordEmail(email, resetToken); // Esta función debe ser implementada para enviar el correo
+            res.status(200).json({ message:'Reset password link sent to your email'});
+        });
+    });
+});
+
+function generateResetToken(email) {
+    // Implementa tu lógica para generar un token seguro aquí
+    return jwt.sign({ email }, jwtSecret, { expiresIn: '1h' });
+}
+
+function sendResetPasswordEmail(email, token) {
+    const resetUrl = `https://storylinematch.com/reset-password?token=${token}`;
+    // Implementa tu lógica para enviar correo electrónico aquí
+    
+      const mailOptions = {
+
+        from: 'no-reply@storylinematch.com',
+        to: email,
+        subject: 'Password reset - Storylinematch',
+        html: `Please click the following link to reset your password: <a href="${resetUrl}">${resetUrl}</a>`
+      };
+    
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.error('Error sending email', error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+}
+
+app.post('/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+        return res.status(400).json({ message:'Token and new password are required'});
+    }
+
+    // Verificar el token y obtener el email
+    try {
+        const { email } = jwt.verify(token, jwtSecret);
+        const hashedPassword = await bcrypt.hash(newPassword, 8);
+
+        // Actualizar la contraseña del usuario
+        const sql = 'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE email = ? AND reset_token = ?';
+        db.query(sql, [hashedPassword, email, token], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message:'Server error'});
+            }
+            if (result.affectedRows === 0) {
+                return res.status(400).json({ message:'Invalid or expired reset token'});
+            }
+
+            res.status(200).json({ message:'Password has been reset successfully. Redirecting...'});
+        });
+    } catch (err) {
+        res.status(400).json({ message:'Invalid or expired token'});
     }
 });
 
@@ -203,8 +291,8 @@ app.post('/generate-response', async (req, res) => {
         });
         res.json({ response: completion.choices[0].message.content });
     } catch (error) {
-        console.error('Error al llamar a OpenAI:', error);
-        res.status(500).send('Error al procesar la solicitud');
+        console.error('Error calling OpenAI:', error);
+        res.status(500).send('Error processing request');
     }
 });
 
@@ -213,7 +301,7 @@ app.get('/search-movie', (req, res) => {
     rapidAPIKey = process.env.RAPID_API_KEY
 
     if (!title || !year) {
-        return res.status(400).send('Debe proporcionar un título y un año.');
+        return res.status(400).send('You must provide a title and year.');
     }
 
     const encodedTitle = encodeURIComponent(title);
@@ -226,8 +314,6 @@ app.get('/search-movie', (req, res) => {
             'X-RapidAPI-Key': rapidAPIKey,
             'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
         }
-
-
     };
 
     const reqApi = https.request(options, function (resApi) {
@@ -282,9 +368,9 @@ app.post('/insert-story-history', authenticateToken, (req, res) => {
     db.query(sql, [idUser, query, movies_data], (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Error al insertar en la base de datos');
+            return res.status(500).send('Error inserting into database');
         }
-        res.status(201).json({ message: 'Historia insertada con éxito' });
+        res.status(201).json({ message: 'History inserted successfully' });
     });
 });
 
@@ -352,15 +438,15 @@ app.delete('/delete-favorite-movie/:title', authenticateToken, (req, res) => {
     db.query(sql, [idUser, title], (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Error al eliminar la película de la base de datos');
+            return res.status(500).send('Error deleting movie from database');
         }
 
         if (result.affectedRows === 0) {
             // Si no se encontró la película (o no pertenece al usuario), enviar un mensaje adecuado
-            return res.status(404).json({ message: 'Película no encontrada o no pertenece al usuario' });
+            return res.status(404).json({ message: 'Movie not found or does not belong to the user' });
         }
 
-        res.status(200).json({ message: 'Película eliminada con éxito' });
+        res.status(200).json({ message: 'Successfully deleted movie' });
     });
 });
 
