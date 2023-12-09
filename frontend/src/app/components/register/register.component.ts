@@ -53,8 +53,9 @@
         this.errorMessage = 'Passwords do not match.';
         return;
       }
-
-      this.http.post('http://localhost:3000/create-user', this.registerForm.value)
+      
+      /* this.http.post('http://localhost:3000/create-user', this.registerForm.value) */
+      this.http.post('https://api.storylinematch.com/create-user', this.registerForm.value)
         .subscribe({
           next: (response: any) => {
             console.log(response)

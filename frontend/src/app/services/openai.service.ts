@@ -8,8 +8,8 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class OpenaiService {
-  private apiUrl = 'http://localhost:3000/generate-response';
-  /* private apiUrl = 'https://api.storylinematch.com/generate-response'; */
+  /* private apiUrl = 'http://localhost:3000/generate-response'; */
+  private apiUrl = 'https://api.storylinematch.com/generate-response';
 
   constructor(private http: HttpClient) {}
 

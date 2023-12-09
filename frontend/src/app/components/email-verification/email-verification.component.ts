@@ -35,8 +35,8 @@ export class EmailVerificationComponent {
 
   verifyEmail(token: string) {
     // Llamar al endpoint de verificación
-    /* this.http.get(`https://api.storylinematch.com/email-verification?token=${token}`) */
-    this.http.get(`http://localhost:3000/verify-email?token=${token}`)
+    /* this.http.get(`http://localhost:3000/verify-email?token=${token}`) */
+    this.http.get(`https://storylinematch.com/verify-email?token=${token}`)
       .subscribe({
         next: (response: any) => {
           this.message = response.message;

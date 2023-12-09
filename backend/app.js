@@ -130,7 +130,7 @@ let transporter = nodemailer.createTransport({
 
 function sendVerificationEmail(email, token) {
     
-    const verificationUrl = `https://storylinematch.com/email-verification?token=${token}`;
+    const verificationUrl = `https://storylinematch.com/verify-email?token=${token}`;
 
     let mailOptions = {
         from: 'no-reply@storylinematch.com',

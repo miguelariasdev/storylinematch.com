@@ -6,7 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class StoryHistoryService {
-  private apiUrl = 'http://localhost:3000';
+  /* private apiUrl = 'http://localhost:3000'; */
+  private apiUrl = 'https://api.storylinematch.com';
+  
 
   constructor(private http: HttpClient) {}
 

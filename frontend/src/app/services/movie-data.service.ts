@@ -7,7 +7,8 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class MovieDataService {
-  private apiUrl = 'http://localhost:3000/search-movie';
+  /* private apiUrl = 'http://localhost:3000/search-movie'; */
+  private apiUrl = 'https://api.storylinematch.com/search-movie';
 
   constructor(private http: HttpClient) {}
 
