@@ -187,6 +187,13 @@ app.post('/request-reset-password', (req, res) => {
             return res.status(404).json({ message: 'Email not found' });
         }
         
+        const user = results[0];
+
+        // Comprobar si el usuario está verificado
+        if (!user.is_verified) {
+            return res.status(401).json({ message: 'Email not verified. Please verify your account first.' });
+        }
+
         const resetToken = generateResetToken(email); // Esta función debe ser implementada para generar un token
 
         // Guardar el token en la base de datos

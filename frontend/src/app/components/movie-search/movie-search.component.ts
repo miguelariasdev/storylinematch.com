@@ -56,8 +56,6 @@ export class MovieSearchComponent {
         const jsonData = JSON.parse(data.response);
         this.OpeanAIResponse = jsonData;
 
-        console.log(this.OpeanAIResponse);
-
         const moviePromises = [];
 
         if (this.OpeanAIResponse.movie_list) {
@@ -70,8 +68,6 @@ export class MovieSearchComponent {
           Promise.all(moviePromises).then(() => {
             // Ahora this.movieData debe estar completo
             const movieDataJSON = JSON.stringify(this.movieData);
-            console.log(movieDataJSON);
-            console.log(this.movieData);
             this.insertStory(this.prompt, movieDataJSON);
             this.loadStory();
     });
@@ -124,9 +120,6 @@ export class MovieSearchComponent {
           } else {
             movieData = data;
           }
-          
-          console.log(this.movieData)
-          console.log(this.movieFavoriteData)
 
           // Añadiendo isFavorite
         this.movieData.forEach((movie: any) => {
@@ -157,7 +150,6 @@ export class MovieSearchComponent {
     this.storyHistoryService.postStoryHistory(query, moviesData).subscribe({
       next: (response) => {
         // Manejar respuesta
-        console.log('Historia insertada', response);
       },
       error: (error) => {
         // Manejar error
@@ -170,7 +162,6 @@ export class MovieSearchComponent {
     this.storyHistoryService.getStoryHistory().subscribe({
       next: (stories) => {
         this.stories = stories;
-        console.log(this.stories)
       },
       error: (error) => {
         console.error('Error al cargar historias', error);
@@ -183,8 +174,6 @@ export class MovieSearchComponent {
     for (let i = 0; i < this.stories.length; i++) {
 
       if (this.stories[i].query === storyQuery) {
-
-        console.log(this.stories[i].query)
 
         const jsonObject = JSON.parse(this.stories[i].movies_data);
         const jsonArray = Object.values(jsonObject);
@@ -212,7 +201,6 @@ export class MovieSearchComponent {
   favoriteMovie(index: number, isFavorite: boolean){
 
     if ( isFavorite ) {
-      console.log("eliminar favorita")
 
       this.movieData[index].isFavorite = false;
       /* const movieDataJSON = JSON.stringify(this.movieData[index]); */
@@ -236,8 +224,6 @@ export class MovieSearchComponent {
         for (let i = 0; i < movies.length; i++) {
           this.movieFavoriteData.push(JSON.parse(movies[i].movie_data))
         }
-
-        console.log(this.movieFavoriteData)
         
       },
       error: (error) => {
@@ -250,7 +236,6 @@ export class MovieSearchComponent {
     this.favoriteMoviesService.postFavoriteMovie(title, movieData).subscribe({
         next: (response) => {
             // Manejar respuesta
-            console.log('Película favorita insertada', response);
         },
         error: (error) => {
             // Manejar error
@@ -262,7 +247,6 @@ export class MovieSearchComponent {
   deleteFavoriteMovie(title: string) {
     this.favoriteMoviesService.deleteFavoriteMovie(title).subscribe({
       next: (response) => {
-        console.log('Película favorita eliminada', response);
         // Podrías hacer algo aquí si necesitas actualizar la UI después de eliminar la película de favoritos
       },
       error: (error) => {

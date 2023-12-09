@@ -1,11 +1,13 @@
 <section class="bg-gray-50 dark:bg-gray-900 pt-6 pb-6 flex items-center justify-center">
   <div class="container-login">
     <div class="container-title">
-      
-      <h1 class="text-4xl md:text-6xl font-bold text-center text-blue-600 mb-4 pb-10">Find the Movie You are Looking for with AI</h1>
+
+      <h1 class="text-4xl md:text-6xl font-bold text-center text-blue-600 mb-4 pb-10">Find the Movie You are Looking for
+        with AI</h1>
 
       <p class="text-lg md:text-xl text-center text-gray-700">
-        Register in our application and once inside, you will only have to indicate the story you want to see. For example:
+        Register in our application and once inside, you will only have to indicate the story you want to see. For
+        example:
       </p>
       <br>
       <p class="text-lg md:text-l text-center text-gray-400">
@@ -13,36 +15,53 @@
       </p>
       <br>
       <p class="text-lg md:text-xl text-center text-gray-700">
-        Our search engine, powered by artificial intelligence, will conduct the search for you and provide you with the 10 results closest to the story you have provided us. Don't wait any longer, log in on our website.
+        Our search engine, powered by artificial intelligence, will conduct the search for you and provide you with the
+        10 results closest to the story you have provided us. Don't wait any longer, log in on our website.
       </p>
 
     </div>
-    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <div
+      class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
       <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
         <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
           Sign in to your account
         </h1>
-        <form class="space-y-4 md:space-y-6" (submit)="login(username.value, password.value)">
+        <form class="space-y-4 md:space-y-6" [formGroup]="loginForm" (ngSubmit)="login()">
           <div>
             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-            <input [(ngModel)]="loginData.email" #username type="email" name="email" id="email"
+            <input formControlName="email" type="email" id="email"
               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="name@company.com" required="">
+
+            <div class="mb-4 text-red-600" *ngIf="loginForm.controls['email'].touched && loginForm.controls['email'].errors">
+              <div *ngIf="loginForm.controls['email'].errors['required']">
+                Email is required.
+              </div>
+              <div *ngIf="loginForm.controls['email'].errors['email']">
+                Please enter a valid email.
+              </div>
+            </div>
+
           </div>
           <div>
             <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-            <input [(ngModel)]="loginData.password" #password type="password" name="password" id="password" placeholder="••••••••"
+            <input formControlName="password" type="password" id="password"
+              placeholder="••••••••"
               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               required="">
+              <div  class="mb-4 text-red-600" *ngIf="loginForm.controls['password'].touched && loginForm.controls['password'].errors?.['required']">
+                Password is required.
+              </div>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-start">
             </div>
-            <a routerLink="/request-reset-password" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot
+            <a routerLink="/request-reset-password"
+              class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot
               password?</a>
           </div>
-          <button type="submit"
-          class="w-full py-2 px-10 text-s font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+          <button type="submit" [disabled]="!loginForm.valid"
+            class="w-full py-2 px-10 text-s font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
             Sign in
           </button>
 
