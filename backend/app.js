@@ -119,9 +119,9 @@ function generateVerificationToken( email ) {
 }
 
 let transporter = nodemailer.createTransport({
-    host: 'mail.storylinematch.com', // Ejemplo: 'mail.tudominio.com'
-    port: 465,     // Por lo general 465 para SSL o 587 para TLS
-    secure: true,             // true para 465, false para otros puertos
+    host: 'mail.storylinematch.com', 
+    port: 465,
+    secure: true,
     auth: {
         user: 'no-reply@storylinematch.com',
         pass: process.env.PASS_EMAIL
