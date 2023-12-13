@@ -17,7 +17,6 @@ export class EmailVerificationComponent {
     private http: HttpClient,
     private router: Router
     ) {
-
   }
 
   ngOnInit() {

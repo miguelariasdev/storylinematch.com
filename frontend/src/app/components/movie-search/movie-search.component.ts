@@ -26,9 +26,6 @@ export class MovieSearchComponent {
 
   selectedStoryIndex: number | null = null;
 
-
-
-
   constructor ( private openaiService: OpenaiService, 
     private movieDataService: MovieDataService, 
     private storyHistoryService: StoryHistoryService,
