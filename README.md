@@ -1,5 +1,5 @@
-Storylinematch is a project created with the goal to help you to find out the movie that you are looking for. 
-If you are interested in a romantic movie with a specific end or just an action film of a robbery in some specific place, I recommended you to give an opportunity to our search engine and try an attempt.
+Storylinematch is a project created to help you find the movie you're looking for.
+If you're interested in a romantic movie with a specific ending, or simply an action film about a robbery in a particular location, I recommend giving our search engine a try.
 
 ![image](https://github.com/user-attachments/assets/13a1d0e8-5054-4d7f-9ea9-93ef758c939d)
 
