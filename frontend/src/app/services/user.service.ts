@@ -15,7 +15,7 @@ import { environment } from '../../environments/environment';
 
     login(email: string, password: string) {
 
-      return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
+      return this.http.post<any>(`${this.apiUrl}/api/auth/login`, { email, password }).pipe(
         tap(res => {
           localStorage.setItem('token', res.token);
           this.isAuthenticatedSubject.next(true);
@@ -27,15 +27,15 @@ import { environment } from '../../environments/environment';
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      return this.http.get<any>(`${this.apiUrl}/user-info`, { headers });
+      return this.http.get<any>(`${this.apiUrl}/api/auth/user-info`, { headers });
     }
 
     requestPasswordReset(email: string) {
-      return this.http.post(`${this.apiUrl}/request-reset-password`, { email });
+      return this.http.post(`${this.apiUrl}/api/auth/request-reset-password`, { email });
     }
 
     resetPassword(token: string, newPassword: string): Observable<any> {
-      return this.http.post<any>(`${this.apiUrl}/reset-password`, { token, newPassword });
+      return this.http.post<any>(`${this.apiUrl}/api/auth/reset-password`, { token, newPassword });
     }
 
     isAuthenticated(): boolean {

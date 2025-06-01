@@ -13,7 +13,7 @@ export class FavoriteMoviesService {
   constructor(private http: HttpClient) {}
 
   postFavoriteMovie(title: string, movieData: any): Observable<any> {
-    const endpoint = `${this.apiUrl}/insert-favorite-movie`;
+    const endpoint = `${this.apiUrl}/api/user/insert-favorite-movie`;
     const body = {
       title: title,
       movieData: movieData
@@ -27,7 +27,7 @@ export class FavoriteMoviesService {
   }
 
   getFavoriteMovies(): Observable<any> {
-    const endpoint = `${this.apiUrl}/get-favorite-movies`;
+    const endpoint = `${this.apiUrl}/api/user/get-favorite-movies`;
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.getToken()}`
     });
@@ -36,7 +36,7 @@ export class FavoriteMoviesService {
   }
 
   deleteFavoriteMovie(title: string): Observable<any> {
-    const endpoint = `${this.apiUrl}/delete-favorite-movie/${encodeURIComponent(title)}`;
+    const endpoint = `${this.apiUrl}/api/user/delete-favorite-movie/${encodeURIComponent(title)}`;
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.getToken()}`
     });

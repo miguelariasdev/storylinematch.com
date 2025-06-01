@@ -13,7 +13,7 @@ export class MovieDataService {
   constructor(private http: HttpClient) {}
 
   getMovieData(title: string, year: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}?title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/api/user?title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}`).pipe(
       catchError(this.handleError)
     );
   }

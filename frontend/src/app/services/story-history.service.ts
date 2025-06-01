@@ -12,7 +12,7 @@ export class StoryHistoryService {
   constructor(private http: HttpClient) {}
 
   postStoryHistory(query: string, movieData: any): Observable<any> {
-    const endpoint = `${this.apiUrl}/insert-story-history`;
+    const endpoint = `${this.apiUrl}/api/user/insert-story-history`;
     const body = {
       query: query,
       movies_data: movieData
@@ -26,7 +26,7 @@ export class StoryHistoryService {
   }
 
   getStoryHistory(): Observable<any> {
-    const endpoint = `${this.apiUrl}/get-story-history`;
+    const endpoint = `${this.apiUrl}/api/user/get-story-history`;
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.getToken()}`
     });

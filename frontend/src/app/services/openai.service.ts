@@ -13,7 +13,7 @@ export class OpenaiService {
   constructor(private http: HttpClient) {}
 
   generateResponse(prompt: string) {
-    return this.http.post<any>(`${this.apiUrl}/generate-response`, { prompt }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/api/ai/generate-response`, { prompt }).pipe(
       catchError(this.handleError)
     );
   }
