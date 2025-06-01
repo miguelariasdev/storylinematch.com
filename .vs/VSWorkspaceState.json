@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\frontend",
+    "\\frontend\\src",
+    "\\frontend\\src\\app",
+    "\\frontend\\src\\app\\services"
+  ],
+  "SelectedNode": "\\frontend\\src\\app\\services\\favorite-movie.service.ts",
+  "PreviewInSolutionExplorer": false
+}

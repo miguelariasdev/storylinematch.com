@@ -1,6 +1,4 @@
 <div class="container-movie">
-
-    <!-- <div class="sidebar w-3/12 mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600"> -->
     <div class="sidebar-container border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
         <h2 class="text-xl dark:text-gray-400">Search history</h2>
         <div class="story-list" *ngIf="stories">
@@ -11,8 +9,6 @@
             </div>
         </div>
     </div>
-
-    <!--     <div class="movie-container w-4/6 pt-5"> -->
     <div class="searcher-container">
         <!-- Form -->
         <form (submit)="onSubmit()">
@@ -25,7 +21,7 @@
                 </div>
                 <div class="flex items-center justify-between px-3 py-2">
                     <span [ngClass]="characterCountClass">{{ 150 - characterCount }}</span>
-                    <button 
+                    <button
                         type="submit"
                         class="inline-flex items-center py-2 px-10 text-s font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
                         [disabled]="isLoading">
@@ -39,14 +35,12 @@
         <div *ngIf="isLoading" class="loading">
             <h2>The search could takes up to 20 seconds</h2>
             <img src="../../../assets/img/loading.gif" alt="Cargando...">
-        </div>
-        
+        </div> 
         <div *ngIf="movieData" class="cards-container">
 
             <div *ngFor="let movie of movieData; let i = index" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <div class="primary-image">
                     <img class="rounded-t-lg" [src]="movie.results[0].primaryImage.url" [alt]="movie.results[0].primaryImage.caption.plainText" />
-                    <!-- <img class="rounded-t-lg" src="https://img.freepik.com/vector-premium/vector-logotipo-cine-vector-pelicula-rollo-sobre-fondo-blanco_472355-306.jpg?w=740" alt="" /> -->
                 </div>
                 <div class="p-5">
 

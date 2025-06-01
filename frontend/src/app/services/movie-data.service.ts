@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MovieDataService {
-  /* private apiUrl = 'http://localhost:3000/search-movie'; */
-  private apiUrl = 'https://api.storylinematch.com/search-movie';
+    private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -19,7 +19,6 @@ export class MovieDataService {
   }
 
   private handleError(error: any) {
-    // Manejo personalizado de errores
     return throwError(error);
   }
 }

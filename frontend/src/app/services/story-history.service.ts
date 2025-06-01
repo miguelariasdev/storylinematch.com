@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryHistoryService {
-  /* private apiUrl = 'http://localhost:3000'; */
-  private apiUrl = 'https://api.storylinematch.com';
-  
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -31,12 +30,11 @@ export class StoryHistoryService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.getToken()}`
     });
-  
+
     return this.http.get(endpoint, { headers: headers });
   }
 
   private getToken(): string {
-    // Obtiene el token JWT almacenado en el cliente
     return localStorage.getItem('token') || '';
   }
 }
