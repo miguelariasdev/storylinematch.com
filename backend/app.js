@@ -15,7 +15,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/ai', aiRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Backend working corretly');
+    res.send('Backend working correctly');
 });
 
 const PORT = process.env.PORT || 3000;
