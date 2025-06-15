@@ -27,7 +27,7 @@ import { environment } from '../../environments/environment';
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      return this.http.get<any>(`${this.apiUrl}/api/auth/user-info`, { headers });
+      return this.http.get<any>(`${this.apiUrl}/api/user/info`, { headers });
     }
 
     requestPasswordReset(email: string) {
